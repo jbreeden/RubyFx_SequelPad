@@ -17,6 +17,6 @@ Essentially, SequelPad is just a Ruby code editor with Sequel preloaded and a ta
 Plans
 -----
 
-Have I mentioned this is an alpha release? In fact, right now it only connect to postgres databases, though Sequel supports all of the major vendors. I also only haven't properly "gemified" the app yet, and I've just been running it with JRuby-Complete through a batch file (all included in the repo for now). Of course, if you have JRuby installed you can just checkout the repo and run bin/sequl-pad.rb to try it out.
+Have I mentioned this is an alpha release? In fact, right now it only connect to postgres databases, though Sequel supports all of the major vendors. I also only haven't properly "gemified" the app yet, and I've just been running it with JRuby-Complete through a batch file (all included in the repo for now). Of course, if you have JRuby installed you can just checkout the repo and run bin/sequel-pad.rb to try it out.
 
 As SequelPad has evolved from an afternoon project, to a weekend project, to my new favorite new, my first steps will be to refactor the code and fit it into a test harness to ease the path forward. Afterwards, there is a growing list of features I intend to add, including support for other database vendors (which probably amounts to all of setting the connection strings correctly). I'll be tracking any new features through Github's issue tracker and I welcome any suggestions or contributors!
