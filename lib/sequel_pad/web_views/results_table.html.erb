@@ -1,0 +1,90 @@
+<html>
+<head>
+  <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js">
+  {
+    overrideConsole: false,
+    startInNewWindow: false,
+    startOpened: true,
+    enableTrace: true
+  }
+  </script>
+  <link rel="stylesheet" href="./css/jquery.dataTables.min.css" type="text/css"/>
+  <link rel="stylesheet" href="./css/dataTables.fixedHeader.min.css" type="text/css"/>
+  <style>
+    * {
+      font-family: Arial;
+    }
+    
+    tbody {
+      font-size: 9pt;
+    }
+    
+    thead {
+      font-size: 10pt;
+      font-style: bold;
+    }
+  </style>
+</head>
+<body>
+  <table id="results_table" class="display cell-border">
+    <thead id="results_header">
+      <td>#</td>
+      <% columns.each do |column| %>
+        <td><%= column %></td>
+      <% end %>
+    </thead>
+    <tbody id="results_body">
+      <% dataset.each do |datum| %>
+      <tr>
+        <td class="index"></td>
+        <% columns.each do |column| %>
+          <td><%= datum[column] %></td>
+        <% end %>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <script src="js/client_hub.js"></script>
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.dataTables.min.js"></script>
+  <script src="js/dataTables.fixedHeader.min.js"></script>
+  <script>
+    hub = {}
+    
+    hub.destroyDatatable = function () {
+      table.destroy();
+    };
+
+    hub.setHtml = function (opts) {
+      $('body').html(opts.html);
+    };
+    
+    function getData(data, callback, settings) {
+      
+    }
+    
+    $(function () {
+      var rowCounter = {
+        index: 1,
+        resetRowNumber: function () {
+          this.index = 1;
+        },
+        numberRow: function (row, data) {
+          $(row).find('td.index').text(this.index);
+          this.index += 1;
+        }
+      };
+      
+      table = $('#results_table').DataTable({
+        searching: false,
+        serverData
+        rowCallback: rowCounter.numberRow.bind(rowCounter),
+        preDrawCallback: rowCounter.resetRowNumber.bind(rowCounter),
+        ajax: 
+      });
+      
+      new $.fn.dataTable.FixedHeader(table);
+    });
+  </script>
+</body>  
+</html>

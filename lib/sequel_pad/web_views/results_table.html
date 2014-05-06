@@ -1,0 +1,172 @@
+<html>
+<head>
+<!--
+  <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js">
+  {
+    overrideConsole: false,
+    startInNewWindow: false,
+    startOpened: true,
+    enableTrace: true
+  }
+  </script>
+-->
+  <link rel="stylesheet" href="./css/jquery.dataTables.min.css" type="text/css"/>
+  <link rel="stylesheet" href="./css/dataTables.fixedHeader.min.css" type="text/css"/>
+  <style>
+    * {
+      font-family: Arial;
+    }
+    
+    tbody {
+      font-size: 9pt;
+    }
+    
+    thead {
+      font-size: 10pt;
+      font-style: bold;
+    }
+    
+    body {
+      /* Hiding the body until the first query comes in */
+      visibility: hidden;
+    }
+    
+    .dataTables_info {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <table id="results_table" class="display cell-border">
+    <thead>
+      <tr id="results_header_row">
+        
+      </tr>
+    </thead>
+  </table>
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.dataTables.js"></script>
+  <script src="js/dataTables.fixedHeader.min.js"></script>
+  <script>
+    
+    // Model
+    // -----
+    
+    var model = {
+      tableColumns: [],
+      tableData: []
+    };
+    
+    // Hub Setup
+    // ---------
+    
+    hub = {};
+    hub.server = {
+      emit: function() {}
+    };
+    
+    hub.destroyDatatable = function () {
+      table.destroy();
+    };
+
+    hub.setHtml = function (opts) {
+      $('body').html(opts.html);
+    };
+    
+    hub.onNewQueryPerformed = function (columnNames) {
+      $('body').css('visibility', 'hidden');
+      model.tableColumns = columnNames;
+      initTable();
+    };
+    
+    hub.onNewData = function (data) {
+      window.onNewData(data);
+    }
+    
+    // DataTable Controls
+    // ------------------
+    
+    var table = null;
+    var tableIsDataTable = false;
+    
+    function initTable() {
+      if (tableIsDataTable) {
+        table.destroy();
+        $('#results_table').find('tbody').empty();
+        $('thead').empty();
+        $('thead').html('<tr id="results_header_row"></tr>');
+      }
+      initTableColumns();
+      table = $('#results_table').DataTable({
+        columns: model.tableColumns.map(function(col){
+          // Datatables chokes if we don't supply column objects,
+          // Though it is supposed to gather the data from the DOM.
+          // So, we're supplying empty options objects
+          return {};
+        }),
+        searching: false,
+        ordering: false,
+        paging: false,
+        ajax: getData,
+        dataSrc: "", // We return an array of arrays, no processing needed
+        serverSide: true
+      });
+      tableIsDataTable = true;
+      $('body').css('visibility', 'visible');
+    }
+    
+    function initTableColumns() {
+      headerHtml = model.tableColumns.reduce(function (result, item) {
+        return result + th(item);
+      }, "");
+      $('#results_header_row').html(headerHtml);
+    }
+    
+    function getData(tableData, callback, settings) {
+      window.onNewData = function(data){
+        callback(data);
+      };
+      hub.server.emit('get_data', tableData);
+    }
+    
+    function th(text){
+      return "<th>" + text + "</th>"; 
+    }
+    
+    // Utils
+    // -----
+    
+    function log(object) {
+      if (typeof object === 'string') {
+        hub.server.emit('log', {message: object});
+      } else {
+        hub.server.emit('log', object);
+      }
+    }
+    
+    // Test
+    // ----
+    
+//    $(function(){
+//      hub.server.emit = function (event, arg) {
+//        if (event == "get_data") {
+//          setTimeout(function(){ 
+//            hub.onNewData({data: [[1, 2]]}); 
+//          }, 1);
+//        }
+//        
+//        if (event == 'log') {
+//          console.log(arg);
+//        }
+//      }
+//      
+//      hub.onNewQueryPerformed(['one', 'two']);
+//      
+////      setTimeout(function(){
+////        hub.onNewQueryPerformed(['one', 'two']);
+////      }, 50)
+//    });
+    
+  </script>
+</body>  
+</html>
